@@ -2,26 +2,93 @@ name: Chrome extension checks
 
 on:
   push:
+    branches: [main]
+    tags: ['v*']
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
+      - name: Validate package, manifest, and tag versions
+        id: metadata
+        shell: bash
+        run: |
+          node --input-type=commonjs <<'NODE'
+          const fs = require('node:fs');
+          const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const manifest = JSON.parse(fs.readFileSync('src/manifest.json', 'utf8'));
+          if (typeof packageJson.version !== 'string' || !/^\d+(?:\.\d+){0,3}$/.test(packageJson.version)) {
+            throw new Error(`package.json version ${packageJson.version} is not valid for a Chrome extension.`);
+          }
+          if (packageJson.version !== manifest.version) {
+            throw new Error(`package.json (${packageJson.version}) and manifest (${manifest.version}) versions differ.`);
+          }
+          if (process.env.GITHUB_REF.startsWith('refs/tags/') && process.env.GITHUB_REF_NAME !== `v${packageJson.version}`) {
+            throw new Error(`Tag ${process.env.GITHUB_REF_NAME} must match v${packageJson.version}.`);
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `version=${packageJson.version}\n`);
+          NODE
       - run: npm test
       - run: cp .env.example .env
       - run: npm run build
-      - uses: actions/upload-artifact@v4
+      - name: Package versioned extension ZIP
+        id: archive
+        env:
+          VERSION: ${{ steps.metadata.outputs.version }}
+        shell: bash
+        run: |
+          filename="primowords-chrome-extension-v${VERSION}.zip"
+          mkdir -p release
+          (cd build && zip -qr "../release/${filename}" .)
+          echo "filename=${filename}" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v7
         with:
-          name: primowords-chrome-extension-${{ github.sha }}
-          path: build/
+          name: primowords-chrome-extension-v${{ steps.metadata.outputs.version }}
+          path: release/${{ steps.archive.outputs.filename }}
           if-no-files-found: error
           retention-days: 14
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: primowords-chrome-extension-v${{ needs.build.outputs.version }}
+          path: release
+      - name: Publish versioned GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ needs.build.outputs.version }}
+          TARGET_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          asset="release/primowords-chrome-extension-v${VERSION}.zip"
+          test -f "$asset"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$asset" --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create "$TAG" "$asset" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$TARGET_SHA" \
+              --title "PrimoWords Chrome Extension $TAG" \
+              --generate-notes \
+              --verify-tag
+          fi

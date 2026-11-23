@@ -174,7 +174,14 @@ export async function buildExtension({ dictionaryPath, apiOrigin, authTokenEndpo
 
   const manifestPath = join(sourceRoot, 'manifest.json');
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
+  const packageJson = JSON.parse(await readFile(join(projectRoot, 'package.json'), 'utf8'));
   if (manifest.manifest_version !== 3) throw new Error('扩展 manifest 必须使用 Manifest V3。');
+  if (typeof packageJson.version !== 'string' || !/^\d+(?:\.\d+){0,3}$/.test(packageJson.version)) {
+    throw new Error('package.json 版本必须是 Chrome 扩展支持的数字格式。');
+  }
+  if (manifest.version !== packageJson.version) {
+    throw new Error('Chrome 扩展版本与 package.json 不一致，请同步更新版本号。');
+  }
   manifest.host_permissions = [`${normalizedApiOrigin}/*`, 'https://www.bing.com/*'];
 
   await mkdir(resolvedOutput, { recursive: true });

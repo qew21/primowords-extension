@@ -119,8 +119,10 @@ test('standalone build writes manifest, runtime files, data and license notice',
       outputDir,
     });
     const manifest = JSON.parse(await readFile(join(outputDir, 'manifest.json'), 'utf8'));
+    const packageJson = JSON.parse(await readFile(join(projectRoot, 'package.json'), 'utf8'));
     const dictionary = JSON.parse(await readFile(join(outputDir, 'dictionary.json'), 'utf8'));
     assert.equal(result.wordCount, 1);
+    assert.equal(manifest.version, packageJson.version);
     assert.equal(manifest.host_permissions[0], 'https://example.org/*');
     assert.ok(manifest.host_permissions.includes('https://www.bing.com/*'));
     assert.equal(dictionary.version, 3);
