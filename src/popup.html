@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>查词 · PrimoWords</title>
+  <script src="embed-mode.js"></script>
+  <link rel="stylesheet" href="popup.css">
+  <script src="ui-language.js"></script>
+  <script defer src="lookup-card.js"></script>
+  <script defer src="popup.js"></script>
+</head>
+<body class="product-page">
+  <div class="app-frame">
+    <header class="app-topbar">
+      <a class="brand-lockup" href="popup.html" aria-label="PrimoWords 查词收藏">
+        <span class="brand-icon"><img src="icon.png" alt="" width="36" height="36"></span>
+        <span class="brand-copy"><strong>PrimoWords</strong><small>查词</small></span>
+      </a>
+      <nav class="primary-nav" aria-label="主导航">
+        <a href="popup.html" aria-current="page">查词</a>
+        <a href="history.html">收藏</a>
+        <a href="options.html#account">设置</a>
+      </nav>
+      <span class="topbar-note">WORD WORKSPACE</span>
+    </header>
+
+    <main class="app-main">
+      <div class="page-hero">
+        <div class="breadcrumb"><a href="popup.html">PrimoWords</a><span aria-hidden="true">/</span><span>查词</span></div>
+        <div class="page-hero-row">
+          <div>
+            <p class="eyebrow">WEB DICTIONARY</p>
+            <h1 id="lookup-title">查清楚，再决定要不要收藏。</h1>
+            <p class="page-lede">优先查询项目词卡与离线词典；没有匹配词卡时自动切换到必应词典。</p>
+          </div>
+        </div>
+      </div>
+
+      <form id="lookup" class="search-panel">
+        <label for="word">查找英文单词</label>
+        <div class="search-control">
+          <input id="word" required maxlength="121" placeholder="输入单词，例如 command" autocomplete="off" spellcheck="false">
+          <button type="submit"><span>查词</span><span aria-hidden="true">↗</span></button>
+        </div>
+        <p class="search-hint">阅读网页时，按住 Ctrl 双击正文单词可直接查词。</p>
+      </form>
+      <p id="lookup-status" class="page-status" role="status"></p>
+      <div id="result" hidden></div>
+    </main>
+
+    <footer class="app-footer"><span>PrimoWords · 查词收藏</span><span>本地词卡优先，收藏去向由你选择</span></footer>
+  </div>
+</body>
+</html>

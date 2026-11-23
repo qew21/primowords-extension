@@ -1,0 +1,1 @@
+Synthetic test fixture created for this project's build tests. It contains no production dictionary content and is included under the project's MIT license.

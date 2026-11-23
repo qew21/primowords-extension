@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>收藏历史 · PrimoWords</title>
+  <script src="embed-mode.js"></script>
+  <link rel="stylesheet" href="popup.css">
+  <script src="ui-language.js"></script>
+  <script type="module" src="history.js"></script>
+</head>
+<body class="product-page history-page">
+  <div class="app-frame">
+    <header class="app-topbar">
+      <a class="brand-lockup" href="popup.html" aria-label="PrimoWords 查词收藏">
+        <span class="brand-icon"><img src="icon.png" alt="" width="36" height="36"></span>
+        <span class="brand-copy"><strong>PrimoWords</strong><small>查词</small></span>
+      </a>
+      <nav class="primary-nav" aria-label="主导航">
+        <a href="popup.html">查词</a>
+        <a href="history.html" aria-current="page">收藏</a>
+        <a href="options.html#account">设置</a>
+      </nav>
+      <span class="topbar-note">WORD WORKSPACE</span>
+    </header>
+
+    <main class="app-main">
+      <div class="page-hero history-hero">
+        <div class="breadcrumb"><a href="popup.html">PrimoWords</a><span aria-hidden="true">/</span><span>收藏历史</span></div>
+        <div class="page-hero-row">
+          <div>
+            <p class="eyebrow">YOUR WORD LIBRARY</p>
+            <h1 id="history-title">收藏历史</h1>
+            <p class="page-lede">按单词或日期找回收藏，查看释义和网页语境，也可以导出或整理记录。</p>
+          </div>
+          <div class="history-promise"><span class="promise-dot" aria-hidden="true"></span><span>来源记录保存在本机</span></div>
+        </div>
+      </div>
+
+      <section class="history-workspace" aria-labelledby="history-title">
+        <div class="history-toolbar">
+          <div class="history-switch" role="group" aria-label="收藏分类">
+            <button class="history-tab" type="button" id="history-account" aria-pressed="true">PrimoWords 账号</button>
+            <button class="history-tab" type="button" id="history-local" aria-pressed="false">仅本机</button>
+            <button class="history-tab" type="button" id="history-eudic" aria-pressed="false" hidden>欧路词典</button>
+          </div>
+          <div class="history-toolbar-actions">
+            <button class="button-secondary history-import" type="button" id="import-open" hidden><span aria-hidden="true">↓</span> 导入 JSON</button>
+            <input type="file" id="import-file" accept=".json,application/json" hidden>
+            <label id="eudic-history-picker" class="eudic-book-control" hidden>欧路词本<select id="eudic-history-book" data-i18n-skip></select></label>
+          </div>
+        </div>
+
+        <p class="history-info" id="history-info" aria-live="polite"></p>
+
+        <section class="history-filter-panel" aria-labelledby="filter-title">
+          <div class="filter-heading">
+            <div><h2 id="filter-title">筛选收藏</h2><p>单词支持完整匹配和前缀搜索，日期可以缩小范围。</p></div>
+            <button class="text-action" id="history-clear" type="button" disabled>清除筛选</button>
+          </div>
+          <div class="history-filters" id="history-filters" hidden>
+            <label class="history-search" for="history-search">单词<input type="search" id="history-search" placeholder="输入单词或开头字母" autocomplete="off" spellcheck="false"></label>
+            <label for="history-from">开始日期<input type="date" id="history-from"></label>
+            <label for="history-to">结束日期<input type="date" id="history-to"></label>
+          </div>
+        </section>
+
+        <div class="history-results-heading">
+          <div class="history-result-statuses">
+            <p id="history-status" class="inline-status" role="status"></p>
+            <p id="export-status" class="inline-status" role="status"></p>
+            <p id="history-feedback" class="inline-status" role="status"></p>
+          </div>
+          <div class="history-export" id="history-export" aria-label="导出筛选结果" role="group" hidden>
+            <span id="export-scope"></span>
+            <button class="button-secondary" id="export-json" type="button">JSON</button>
+            <button class="button-secondary" id="export-csv" type="button">CSV</button>
+            <button class="button-secondary export-anki" id="export-anki" type="button">Anki TSV</button>
+          </div>
+        </div>
+
+        <nav id="history-pagination-top" class="history-pagination history-pagination-top" aria-label="收藏历史页首分页" hidden>
+          <button class="pagination-button" id="history-prev-top" type="button"><span aria-hidden="true">←</span> 上一页</button>
+          <span id="history-page-top" role="status"></span>
+          <button class="pagination-button" id="history-next-top" type="button">下一页 <span aria-hidden="true">→</span></button>
+        </nav>
+        <ol id="history-list" class="history-list" tabindex="-1"></ol>
+        <nav id="history-pagination" class="history-pagination history-pagination-bottom" aria-label="收藏历史分页" hidden>
+          <button class="pagination-button" id="history-prev" type="button"><span aria-hidden="true">←</span> 上一页</button>
+          <span id="history-page" role="status"></span>
+          <button class="pagination-button" id="history-next" type="button">下一页 <span aria-hidden="true">→</span></button>
+        </nav>
+      </section>
+    </main>
+
+    <footer class="app-footer"><span>PrimoWords · 查词收藏</span><span>本地词卡优先，收藏去向由你选择</span></footer>
+
+    <template id="history-speak">
+      <button class="history-speak" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a4 4 0 0 1 0 6m3-9a8 8 0 0 1 0 12"/></svg>
+      </button>
+    </template>
+    <dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description">
+      <h2 id="delete-title">删除收藏？</h2>
+      <p id="delete-description"></p>
+      <p id="delete-error" role="status" data-error="true"></p>
+      <div class="dialog-actions">
+        <button class="button-secondary" id="delete-cancel" type="button" autofocus>取消</button>
+        <button class="danger" id="delete-confirm" type="button">删除收藏</button>
+      </div>
+    </dialog>
+    <dialog id="sentence-dialog" aria-labelledby="sentence-title">
+      <h2 id="sentence-title">例句和译文</h2>
+      <p id="sentence-original" class="sentence-text" lang="en"></p>
+      <p id="sentence-source"></p>
+      <button class="button-secondary" id="sentence-examples" type="button" hidden>从必应词典选例句</button>
+      <ul class="sentence-examples" id="sentence-choices"></ul>
+      <div id="sentence-translation-editor" hidden>
+        <label for="sentence-translation">中文译文</label>
+        <textarea id="sentence-translation" rows="3" maxlength="2000" lang="zh-CN"></textarea>
+        <button class="button-secondary" id="sentence-translate" type="button">用 Chrome 翻译</button>
+      </div>
+      <p id="sentence-status" role="status"></p>
+      <div class="dialog-actions">
+        <button class="button-secondary" id="sentence-cancel" type="button" autofocus>取消</button>
+        <button class="primary-action compact-action" id="sentence-save" type="button">保存</button>
+      </div>
+    </dialog>
+    <dialog id="import-dialog" aria-labelledby="import-title">
+      <h2 id="import-title">导入仅本机收藏</h2>
+      <p id="import-summary" role="status"></p>
+      <ul class="import-preview" id="import-preview"></ul>
+      <div class="dialog-actions">
+        <button class="button-secondary" id="import-cancel" type="button" autofocus>取消</button>
+        <button class="primary-action compact-action" id="import-confirm" type="button" disabled>导入</button>
+      </div>
+    </dialog>
+  </div>
+</body>
+</html>

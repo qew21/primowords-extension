@@ -1,0 +1,27 @@
+name: Chrome extension checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm test
+      - run: cp .env.example .env
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: primowords-chrome-extension-${{ github.sha }}
+          path: build/
+          if-no-files-found: error
+          retention-days: 14

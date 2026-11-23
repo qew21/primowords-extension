@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>设置 · PrimoWords</title>
+  <script src="embed-mode.js"></script>
+  <link rel="stylesheet" href="popup.css">
+  <script src="ui-language.js"></script>
+  <script type="module" src="options.js"></script>
+</head>
+<body class="product-page options-page">
+  <div class="app-frame">
+    <header class="app-topbar">
+      <a class="brand-lockup" href="popup.html" aria-label="PrimoWords 查词收藏">
+        <span class="brand-icon"><img src="icon.png" alt="" width="36" height="36"></span>
+        <span class="brand-copy"><strong>PrimoWords</strong><small>查词</small></span>
+      </a>
+      <nav class="primary-nav" aria-label="主导航">
+        <a href="popup.html">查词</a>
+        <a href="history.html">收藏</a>
+        <a href="options.html#account" aria-current="page">设置</a>
+      </nav>
+      <span class="topbar-note">WORD WORKSPACE</span>
+    </header>
+
+    <main class="app-main">
+      <div class="page-hero">
+        <div class="breadcrumb"><a href="popup.html">PrimoWords</a><span aria-hidden="true">/</span><span>设置</span></div>
+        <div class="page-hero-row">
+          <div>
+            <p class="eyebrow">YOUR READING WORKSPACE</p>
+            <h1>把查词和收藏调成顺手的样子。</h1>
+            <p class="page-lede">账号和收藏去向集中管理，网页查词方式单独设置；修改后会自动保存。</p>
+          </div>
+          <a class="hero-link" href="history.html"><span class="hero-link-icon" aria-hidden="true">↗</span>打开收藏历史</a>
+        </div>
+      </div>
+
+      <div class="settings-layout">
+        <nav class="settings-nav" aria-label="设置分页">
+          <p class="settings-nav-label">设置项目</p>
+          <a class="settings-nav-item" href="#account" data-settings-link="account" aria-current="page">
+            <span class="settings-nav-index">01</span>
+            <span><strong>账号与收藏</strong><small>登录状态与收藏去向</small></span>
+          </a>
+          <a class="settings-nav-item" href="#lookup-guide" data-settings-link="lookup-guide">
+            <span class="settings-nav-index">02</span>
+            <span><strong>查词方式</strong><small>网页操作与手动查询</small></span>
+          </a>
+          <div class="settings-nav-foot">
+            <a class="settings-history-link" href="history.html">
+              <span class="nav-foot-mark" aria-hidden="true">收</span>
+              <span><strong>收藏</strong><small>查看、筛选与导出记录</small></span>
+              <span class="nav-foot-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </nav>
+
+        <div class="settings-content" id="settings-content">
+          <section class="settings-view" id="account" data-settings-page="account" aria-labelledby="account-title">
+            <div class="view-heading">
+              <p class="section-kicker">01 / ACCOUNT & SAVING</p>
+              <h2 id="account-title">账号与收藏</h2>
+              <p>在这里登录 PrimoWords 账号并设置收藏去向；没有项目词卡的单词仍可收藏到本机或欧路。</p>
+            </div>
+            <section class="product-panel language-preference" aria-labelledby="language-title">
+              <div class="language-copy">
+                <span class="field-kicker">APP LANGUAGE</span>
+                <h3 id="language-title">界面语言</h3>
+                <p>选择扩展界面语言；自动模式会跟随浏览器语言。</p>
+              </div>
+              <div class="language-control">
+                <label for="ui-language">显示语言</label>
+                <select id="ui-language">
+                  <option value="auto">自动（跟随浏览器）</option>
+                  <option value="zh-CN">简体中文</option>
+                  <option value="en">English</option>
+                </select>
+                <p id="language-status" class="inline-status" role="status"></p>
+              </div>
+            </section>
+            <div class="product-panel account-panel">
+              <div class="panel-heading">
+                <div class="provider-lockup">
+                  <span class="provider-mark primowords-mark" aria-hidden="true">原</span>
+                  <div>
+                    <h3>PrimoWords 账号</h3>
+                    <p>同步项目词卡收藏到你的PrimoWords 账号</p>
+                  </div>
+                </div>
+                <span class="state-badge" id="account-state" data-state="loading">正在读取状态</span>
+              </div>
+
+              <form id="sign-in" class="sign-in-form" hidden>
+                <div class="form-copy">
+                  <h4>登录你的PrimoWords 账号</h4>
+                  <p>登录后可同步PrimoWords 词卡收藏。欧路连接、默认收藏去向和 Anki 导出也在本页管理。</p>
+                </div>
+                <div class="form-fields">
+                  <label for="login">邮箱或手机号</label>
+                  <input id="login" name="login" autocomplete="username" required maxlength="320" placeholder="邮箱或手机号">
+                  <label for="password">密码</label>
+                  <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128" placeholder="输入密码">
+                </div>
+                <button class="primary-action" type="submit"><span>登录 PrimoWords</span><span aria-hidden="true">→</span></button>
+              </form>
+
+              <div class="identity-card" id="signed-in" hidden>
+                <span class="identity-avatar" aria-hidden="true">原</span>
+                <div class="identity-copy">
+                  <span class="field-kicker">当前登录账号</span>
+                  <strong id="identity" data-i18n-skip></strong>
+                  <p>PrimoWords 词卡收藏会与此账号关联。</p>
+                </div>
+                <button class="button-secondary" id="sign-out" type="button">退出登录</button>
+              </div>
+
+              <p id="account-status" class="inline-status" role="status">正在读取登录状态…</p>
+              <button class="text-action" id="reset-session" type="button" hidden>清除本机登录记录</button>
+            </div>
+            <aside class="help-callout">
+              <span class="callout-icon" aria-hidden="true">i</span>
+              <p>已登录时，查词卡片会显示昵称。登录状态会保存在这台浏览器中，退出后才会清除。</p>
+            </aside>
+            <section class="collection-settings-section" id="collections" aria-labelledby="collection-title">
+              <div class="view-heading">
+                <p class="section-kicker">SAVE DESTINATION</p>
+                <h3 id="collection-title">收藏去向</h3>
+                <p>选择新词的默认保存位置。每次查词后仍可按单词情况决定是否收藏。</p>
+              </div>
+              <div class="product-panel collection-settings-panel">
+                <div class="destination-preference">
+                  <div class="destination-copy">
+                    <span class="field-kicker">DEFAULT DESTINATION</span>
+                    <h3>默认收藏去向</h3>
+                    <p>PrimoWords 自动模式会将有词卡的单词同步到账号，其他单词保存到本机。</p>
+                  </div>
+                  <div class="destination-control">
+                    <label for="preferred-collection">新收藏保存到</label>
+                    <select id="preferred-collection" disabled>
+                      <option value="auto">PrimoWords 自动选择</option>
+                      <option value="local">仅本机</option>
+                      <option value="eudic" disabled>欧路词典</option>
+                    </select>
+                  </div>
+                </div>
+
+                <section class="provider-card eudic-card" aria-labelledby="eudic-title">
+                  <div class="provider-card-heading">
+                    <div class="provider-lockup">
+                      <span class="provider-mark eudic-mark" aria-hidden="true">欧</span>
+                      <div>
+                        <h3 id="eudic-title">欧路词典</h3>
+                        <p>查词后直接加入指定的欧路单词本</p>
+                      </div>
+                    </div>
+                    <span class="provider-connection" id="eudic-connected">尚未连接</span>
+                  </div>
+                  <div class="eudic-setup">
+                    <div class="form-label-row"><label for="eudic-token">OpenAPI 授权串</label><a class="inline-link" href="https://my.eudic.net/OpenAPI/Authorization" target="_blank" rel="noopener noreferrer">获取授权串 <span aria-hidden="true">↗</span></a></div>
+                    <div class="input-action-row">
+                      <input type="password" id="eudic-token" autocomplete="off" spellcheck="false" maxlength="4096" placeholder="粘贴欧路 NIS 授权串">
+                      <button class="button-secondary" type="button" id="eudic-load" disabled>读取词本</button>
+                    </div>
+                    <div id="eudic-picker" class="book-picker" hidden>
+                      <label for="eudic-book">选择目标词本</label>
+                      <select id="eudic-book" data-i18n-skip></select>
+                      <button class="primary-action compact-action" type="button" id="eudic-save">保存并设为默认</button>
+                    </div>
+                    <label class="context-setting" id="eudic-context-option" hidden>
+                      <input type="checkbox" id="eudic-context"> 添加欧路新词时发送网页原句（最多 600 个字符）
+                    </label>
+                    <button class="text-action danger-text" type="button" id="eudic-disconnect" hidden>断开欧路连接</button>
+                    <p id="eudic-status" class="inline-status" role="status"></p>
+                  </div>
+                </section>
+
+                <section class="provider-card anki-card" aria-labelledby="anki-title">
+                  <div class="provider-card-heading">
+                    <div class="provider-lockup">
+                      <span class="provider-mark anki-mark" aria-hidden="true">A</span>
+                      <div>
+                        <h3 id="anki-title">Anki 导出</h3>
+                        <p>从收藏历史导出带释义与语境的 TSV 卡片</p>
+                      </div>
+                    </div>
+                    <span class="provider-connection static-connection">按需导出</span>
+                  </div>
+                  <div class="anki-settings-row">
+                    <div>
+                      <label for="anki-layout">导出卡片格式</label>
+                      <select id="anki-layout" disabled>
+                        <option value="basic">基础卡片（单词 / 完整背面）</option>
+                        <option value="fields">独立字段（适用于自定义笔记类型）</option>
+                      </select>
+                    </div>
+                    <a class="button-link" id="anki-history" href="history.html#history-export">前往收藏历史导出 TSV <span aria-hidden="true">→</span></a>
+                  </div>
+                </section>
+                <p id="collection-status" class="inline-status" role="status"></p>
+              </div>
+            </section>
+          </section>
+
+          <section class="settings-view" id="lookup-guide" data-settings-page="lookup-guide" aria-labelledby="usage-title" hidden>
+            <div class="view-heading">
+              <p class="section-kicker">02 / READING</p>
+              <h2 id="usage-title">网页查词</h2>
+              <p>选词之后，释义、发音和收藏都在当前阅读流程里完成。</p>
+            </div>
+            <div class="product-panel guide-panel">
+              <ol class="guide-steps">
+                <li><span class="guide-step-number">01</span><div><strong>双击英文单词</strong><p>按住 Ctrl 双击正文中的单词可直接查词；普通双击后点击鼠标旁的圆形PrimoWords 图标，也可以使用右键菜单。</p></div></li>
+                <li><span class="guide-step-number">02</span><div><strong>查看单词卡片</strong><p>查词卡片会显示释义、级别、词频和发音入口。</p></div></li>
+                <li><span class="guide-step-number">03</span><div><strong>阅读后再决定收藏</strong><p>有项目词卡的单词可同步到PrimoWords；其他单词可存到本机或已连接的欧路词本。</p></div></li>
+              </ol>
+              <div class="guide-footer">
+                <p>部分网站会限制扩展访问。遇到这种情况，可以手动输入单词继续查词。</p>
+                <a class="button-link" href="workspace.html#lookup" target="_blank" rel="noopener">打开手动查词 <span aria-hidden="true">↗</span></a>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer class="app-footer"><span>PrimoWords · 查词收藏</span><span>本地词卡优先，收藏去向由你选择</span><a id="privacy-policy" href="#" target="_blank" rel="noopener">隐私政策</a></footer>
+  </div>
+</body>
+</html>

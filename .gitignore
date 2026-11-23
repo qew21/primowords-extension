@@ -1,0 +1,7 @@
+node_modules/
+build/
+*.zip
+data/*.json
+!data/dictionary.json
+.env
+!.env.example

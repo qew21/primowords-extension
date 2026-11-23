@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "PrimoWords · 查词收藏",
+  "version": "0.2.19",
+  "description": "离线查询英文词义，并收藏到 PrimoWords 账号。",
+  "minimum_chrome_version": "120",
+  "permissions": ["contextMenus", "storage", "offscreen", "tts"],
+  "optional_host_permissions": ["https://api.frdic.com/*"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": {
+    "default_title": "PrimoWords 设置",
+    "default_icon": { "16": "icon-16.png", "32": "icon-32.png" }
+  },
+  "options_ui": { "page": "workspace.html", "open_in_tab": true },
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["ui-language.js", "lookup-card.js", "content.js"],
+    "all_frames": true
+  }],
+  "web_accessible_resources": [{
+    "resources": ["icon.png"],
+    "matches": ["http://*/*", "https://*/*"]
+  }],
+  "icons": { "16": "icon-16.png", "32": "icon-32.png", "48": "icon-48.png", "128": "icon.png" }
+}

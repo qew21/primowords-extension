@@ -1,0 +1,5 @@
+Dictionary data source notice
+
+The bundled dictionary contains ECDICT-derived definitions, phonetics and frequency ranks, plus individual headwords and level labels from public vocabulary references. COCA/BNC ranks use ECDICT CSV fields `frq` and `bnc`. The ECDICT MIT license is included as `ECDICT-LICENSE.txt`.
+
+This dictionary contains word entries only; it does not include game dialogue, quest text or example sentences. This notice records data provenance; retain it and the upstream license when distributing the dictionary.

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>PrimoWords · 查词收藏</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="ui-language.js"></script>
+  <script defer src="workspace.js"></script>
+</head>
+<body class="product-page workspace-page">
+  <div class="app-frame">
+    <header class="app-topbar">
+      <a class="brand-lockup" href="#lookup" data-workspace-route="lookup" aria-label="PrimoWords 查词收藏">
+        <span class="brand-icon"><img src="icon.png" alt="" width="36" height="36"></span>
+        <span class="brand-copy"><strong>PrimoWords</strong><small>查词</small></span>
+      </a>
+      <nav class="primary-nav" aria-label="主导航">
+        <a href="#lookup" data-workspace-route="lookup">查词</a>
+        <a href="#history" data-workspace-route="history">收藏</a>
+        <a href="#settings" data-workspace-route="settings" aria-current="page">设置</a>
+      </nav>
+      <span class="topbar-note">WORD WORKSPACE</span>
+    </header>
+
+    <main class="workspace-main">
+      <div class="workspace-loading" id="workspace-loading" role="status" hidden>
+        <p id="workspace-loading-message">正在打开页面…</p>
+        <button class="button-secondary" id="workspace-retry" type="button" hidden>重新加载</button>
+      </div>
+      <iframe class="workspace-frame" data-workspace-frame="lookup" title="查词" hidden></iframe>
+      <iframe class="workspace-frame" data-workspace-frame="history" title="收藏历史" hidden></iframe>
+      <iframe class="workspace-frame" data-workspace-frame="settings" title="设置" hidden></iframe>
+    </main>
+
+    <footer class="app-footer"><span>PrimoWords · 查词收藏</span><span>本地词卡优先，收藏去向由你选择</span></footer>
+  </div>
+</body>
+</html>
