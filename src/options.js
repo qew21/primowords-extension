@@ -20,7 +20,7 @@ function renderSettingsRoute() {
     if (link.dataset.settingsLink === active.dataset.settingsPage) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   }
-  const title = active.dataset.settingsPage === 'lookup-guide' ? '查词方式' : '账号与收藏';
+  const title = active.dataset.settingsPage === 'lookup-guide' ? '查词方式' : '收藏去向';
   setText(document.querySelector('title'), '{title} · PrimoWords', { title: i18n?.t(title) ?? title });
 }
 

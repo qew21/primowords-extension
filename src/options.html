@@ -32,7 +32,7 @@
           <div>
             <p class="eyebrow">YOUR READING WORKSPACE</p>
             <h1>把查词和收藏调成顺手的样子。</h1>
-            <p class="page-lede">账号和收藏去向集中管理，网页查词方式单独设置；修改后会自动保存。</p>
+            <p class="page-lede">收藏去向集中管理，网页查词方式单独设置；修改后会自动保存。</p>
           </div>
           <a class="hero-link" href="history.html"><span class="hero-link-icon" aria-hidden="true">↗</span>打开收藏历史</a>
         </div>
@@ -43,7 +43,7 @@
           <p class="settings-nav-label">设置项目</p>
           <a class="settings-nav-item" href="#account" data-settings-link="account" aria-current="page">
             <span class="settings-nav-index">01</span>
-            <span><strong>账号与收藏</strong><small>登录状态与收藏去向</small></span>
+            <span><strong>收藏去向</strong><small>PrimoWords、欧路或本机</small></span>
           </a>
           <a class="settings-nav-item" href="#lookup-guide" data-settings-link="lookup-guide">
             <span class="settings-nav-index">02</span>
@@ -61,9 +61,9 @@
         <div class="settings-content" id="settings-content">
           <section class="settings-view" id="account" data-settings-page="account" aria-labelledby="account-title">
             <div class="view-heading">
-              <p class="section-kicker">01 / ACCOUNT & SAVING</p>
-              <h2 id="account-title">账号与收藏</h2>
-              <p>在这里登录 PrimoWords 账号并设置收藏去向；没有项目词卡的单词仍可收藏到本机或欧路。</p>
+              <p class="section-kicker">01 / SAVE DESTINATIONS</p>
+              <h2 id="account-title">收藏去向</h2>
+              <p>管理新词默认保存位置。连接 PrimoWords 账号可同步词卡内单词；连接欧路可存入指定词本，也可只保存到本机。</p>
             </div>
             <section class="product-panel language-preference" aria-labelledby="language-title">
               <div class="language-copy">
@@ -81,66 +81,62 @@
                 <p id="language-status" class="inline-status" role="status"></p>
               </div>
             </section>
-            <div class="product-panel account-panel">
-              <div class="panel-heading">
-                <div class="provider-lockup">
-                  <span class="provider-mark primowords-mark" aria-hidden="true">原</span>
-                  <div>
-                    <h3>PrimoWords 账号</h3>
-                    <p>同步项目词卡收藏到你的PrimoWords 账号</p>
+            <section class="collection-settings-section" id="collections" aria-labelledby="account-title">
+              <div class="product-panel account-panel">
+                <div class="panel-heading">
+                  <div class="provider-lockup">
+                    <span class="provider-mark primowords-mark" aria-hidden="true">原</span>
+                    <div>
+                      <h3>PrimoWords 账号</h3>
+                      <p>连接账号后，同步有 PrimoWords 词卡的收藏</p>
+                    </div>
                   </div>
+                  <span class="state-badge" id="account-state" data-state="loading">正在读取状态</span>
                 </div>
-                <span class="state-badge" id="account-state" data-state="loading">正在读取状态</span>
-              </div>
 
-              <form id="sign-in" class="sign-in-form" hidden>
-                <div class="form-copy">
-                  <h4>登录你的PrimoWords 账号</h4>
-                  <p>登录后可同步PrimoWords 词卡收藏。欧路连接、默认收藏去向和 Anki 导出也在本页管理。</p>
-                </div>
-                <div class="form-fields">
-                  <label for="login">邮箱或手机号</label>
-                  <input id="login" name="login" autocomplete="username" required maxlength="320" placeholder="邮箱或手机号">
-                  <label for="password">密码</label>
-                  <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128" placeholder="输入密码">
-                </div>
-                <button class="primary-action" type="submit"><span>登录 PrimoWords</span><span aria-hidden="true">→</span></button>
-              </form>
+                <form id="sign-in" class="sign-in-form" hidden>
+                  <div class="form-copy">
+                    <h4>登录你的PrimoWords 账号</h4>
+                    <p>登录后可将有 PrimoWords 词卡的收藏同步到账号。</p>
+                  </div>
+                  <div class="form-fields">
+                    <label for="login">邮箱或手机号</label>
+                    <input id="login" name="login" autocomplete="username" required maxlength="320" placeholder="邮箱或手机号">
+                    <label for="password">密码</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128" placeholder="输入密码">
+                  </div>
+                  <button class="primary-action" type="submit"><span>登录 PrimoWords</span><span aria-hidden="true">→</span></button>
+                </form>
 
-              <div class="identity-card" id="signed-in" hidden>
-                <span class="identity-avatar" aria-hidden="true">原</span>
-                <div class="identity-copy">
-                  <span class="field-kicker">当前登录账号</span>
-                  <strong id="identity" data-i18n-skip></strong>
-                  <p>PrimoWords 词卡收藏会与此账号关联。</p>
+                <div class="identity-card" id="signed-in" hidden>
+                  <span class="identity-avatar" aria-hidden="true">原</span>
+                  <div class="identity-copy">
+                    <span class="field-kicker">当前登录账号</span>
+                    <strong id="identity" data-i18n-skip></strong>
+                    <p>PrimoWords 词卡收藏会与此账号关联。</p>
+                  </div>
+                  <button class="button-secondary" id="sign-out" type="button">退出登录</button>
                 </div>
-                <button class="button-secondary" id="sign-out" type="button">退出登录</button>
-              </div>
 
-              <p id="account-status" class="inline-status" role="status">正在读取登录状态…</p>
-              <button class="text-action" id="reset-session" type="button" hidden>清除本机登录记录</button>
-            </div>
-            <aside class="help-callout">
-              <span class="callout-icon" aria-hidden="true">i</span>
-              <p>已登录时，查词卡片会显示昵称。登录状态会保存在这台浏览器中，退出后才会清除。</p>
-            </aside>
-            <section class="collection-settings-section" id="collections" aria-labelledby="collection-title">
-              <div class="view-heading">
-                <p class="section-kicker">SAVE DESTINATION</p>
-                <h3 id="collection-title">收藏去向</h3>
-                <p>选择新词的默认保存位置。每次查词后仍可按单词情况决定是否收藏。</p>
+                <p id="account-status" class="inline-status" role="status">正在读取登录状态…</p>
+                <button class="text-action" id="reset-session" type="button" hidden>清除本机登录记录</button>
               </div>
+              <aside class="help-callout">
+                <span class="callout-icon" aria-hidden="true">i</span>
+                <p>已登录时，查词卡片会显示昵称。登录状态会保存在这台浏览器中，退出后才会清除。</p>
+              </aside>
+
               <div class="product-panel collection-settings-panel">
                 <div class="destination-preference">
                   <div class="destination-copy">
                     <span class="field-kicker">DEFAULT DESTINATION</span>
                     <h3>默认收藏去向</h3>
-                    <p>PrimoWords 自动模式会将有词卡的单词同步到账号，其他单词保存到本机。</p>
+                    <p>智能选择会将有词卡的单词同步到 PrimoWords 账号，其他单词保存到本机。连接欧路后，也可设为默认去向。</p>
                   </div>
                   <div class="destination-control">
                     <label for="preferred-collection">新收藏保存到</label>
                     <select id="preferred-collection" disabled>
-                      <option value="auto">PrimoWords 自动选择</option>
+                      <option value="auto">智能选择</option>
                       <option value="local">仅本机</option>
                       <option value="eudic" disabled>欧路词典</option>
                     </select>
@@ -153,7 +149,7 @@
                       <span class="provider-mark eudic-mark" aria-hidden="true">欧</span>
                       <div>
                         <h3 id="eudic-title">欧路词典</h3>
-                        <p>查词后直接加入指定的欧路单词本</p>
+                        <p>收藏时直接加入指定的欧路单词本</p>
                       </div>
                     </div>
                     <span class="provider-connection" id="eudic-connected">尚未连接</span>
@@ -177,32 +173,38 @@
                   </div>
                 </section>
 
-                <section class="provider-card anki-card" aria-labelledby="anki-title">
-                  <div class="provider-card-heading">
-                    <div class="provider-lockup">
-                      <span class="provider-mark anki-mark" aria-hidden="true">A</span>
-                      <div>
-                        <h3 id="anki-title">Anki 导出</h3>
-                        <p>从收藏历史导出带释义与语境的 TSV 卡片</p>
-                      </div>
-                    </div>
-                    <span class="provider-connection static-connection">按需导出</span>
-                  </div>
-                  <div class="anki-settings-row">
-                    <div>
-                      <label for="anki-layout">导出卡片格式</label>
-                      <select id="anki-layout" disabled>
-                        <option value="basic">基础卡片（单词 / 完整背面）</option>
-                        <option value="fields">独立字段（适用于自定义笔记类型）</option>
-                      </select>
-                    </div>
-                    <a class="button-link" id="anki-history" href="history.html#history-export">前往收藏历史导出 TSV <span aria-hidden="true">→</span></a>
-                  </div>
-                </section>
                 <p id="collection-status" class="inline-status" role="status"></p>
               </div>
             </section>
-          </section>
+            <section class="export-settings-section" aria-labelledby="anki-section-title">
+              <div class="view-heading">
+                <p class="section-kicker">EXPORT & ANKI</p>
+                <h3 id="anki-section-title">导出与 Anki 制卡</h3>
+                <p>在收藏历史导出 JSON、CSV 或 Anki TSV；这里设置 TSV 卡片格式。</p>
+              </div>
+              <section class="provider-card anki-card" aria-labelledby="anki-title">
+                <div class="provider-card-heading">
+                  <div class="provider-lockup">
+                    <span class="provider-mark anki-mark" aria-hidden="true">A</span>
+                    <div>
+                      <h3 id="anki-title">Anki 导出</h3>
+                      <p>从收藏历史导出带释义与语境的 TSV 卡片</p>
+                    </div>
+                  </div>
+                  <span class="provider-connection static-connection">按需导出</span>
+                </div>
+                <div class="anki-settings-row">
+                  <div>
+                    <label for="anki-layout">导出卡片格式</label>
+                    <select id="anki-layout" disabled>
+                      <option value="basic">基础卡片（单词 / 完整背面）</option>
+                      <option value="fields">独立字段（适用于自定义笔记类型）</option>
+                    </select>
+                  </div>
+                  <a class="button-link" id="anki-history" href="history.html#history-export">前往收藏历史导出 TSV <span aria-hidden="true">→</span></a>
+                </div>
+              </section>
+            </section>          </section>
 
           <section class="settings-view" id="lookup-guide" data-settings-page="lookup-guide" aria-labelledby="usage-title" hidden>
             <div class="view-heading">

@@ -1,6 +1,6 @@
 {
   "name": "primowords-chrome-extension",
-  "version": "0.2.19",
+  "version": "0.2.20",
   "description": "PrimoWords Chrome extension for English lookup and vocabulary saving",
   "license": "MIT",
   "private": false,
