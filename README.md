@@ -20,6 +20,8 @@ npm run build
 
 网页选词需要扩展访问当前网站。离线查词、本机收藏、历史记录和导出均在本机完成；账号收藏、必应查词及欧路同步按用户操作发送对应内容。欧路新词网页原句同步默认开启，可在扩展设置中关闭。详情见 [隐私说明](PRIVACY.md)。
 
+首次使用时，扩展会先展示数据处理说明并要求确认；确认前不会启用网页查词、收藏、历史或账号功能。
+
 ## English
 
 PrimoWords is a Manifest V3 Chrome extension for English lookup and vocabulary saving. Source and build scripts are MIT licensed. The bundled dictionary has separate provenance and ECDICT license notices; keep them when redistributing the extension. Build with Node.js 24 after copying `.env.example` to `.env`.

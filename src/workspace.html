@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <title>PrimoWords · 查词收藏</title>
   <link rel="stylesheet" href="popup.css">
+  <script src="privacy-consent.js"></script>
   <script src="ui-language.js"></script>
   <script defer src="workspace.js"></script>
 </head>
@@ -16,7 +17,7 @@
         <span class="brand-icon"><img src="icon.png" alt="" width="36" height="36"></span>
         <span class="brand-copy"><strong>PrimoWords</strong><small>查词</small></span>
       </a>
-      <nav class="primary-nav" aria-label="主导航">
+      <nav class="primary-nav" aria-label="主导航" hidden>
         <a href="#lookup" data-workspace-route="lookup">查词</a>
         <a href="#history" data-workspace-route="history">收藏</a>
         <a href="#settings" data-workspace-route="settings" aria-current="page">设置</a>
@@ -25,6 +26,46 @@
     </header>
 
     <main class="workspace-main">
+      <section class="privacy-consent" id="privacy-consent" aria-labelledby="privacy-consent-title" hidden>
+        <div class="privacy-consent-card">
+          <p class="eyebrow">PRIVACY NOTICE</p>
+          <h1 id="privacy-consent-title">使用 PrimoWords 前，请确认数据处理方式</h1>
+          <p class="privacy-consent-intro">只有在你主动查词或使用收藏功能时，扩展才会处理以下信息。请阅读后勾选同意，才能继续使用。</p>
+
+          <div class="privacy-consent-details">
+            <section>
+              <h2>网页查词与本机记录</h2>
+              <ul>
+                <li>你主动双击查词或使用右键查词时，扩展读取所选英文单词，并优先查询随扩展提供的离线词典。</li>
+                <li>网页双击或使用右键查词时，扩展读取当前网页地址和标题；双击还会读取包含所选词的句子，用于查词卡片及本机收藏来源记录。这些来源不会随查词发送给 PrimoWords。</li>
+                <li>离线词典没有词卡时，扩展会把所选单词发送给 Bing Dictionary 查询释义和音标；不会发送网页地址、标题或句子。</li>
+                <li>本机收藏、历史、网页来源和句子保存在当前 Chrome 配置中，不会同步到开发者服务器。</li>
+              </ul>
+            </section>
+            <section>
+              <h2>收藏去向与其他功能</h2>
+              <ul>
+                <li>登录时，邮箱或手机号及密码通过 HTTPS 发送给配置的账号服务；密码不保存在扩展中。登录令牌保存在本机，并随账号操作发送给服务以完成验证；收藏到账号时会发送单词和收藏操作。</li>
+                <li>连接欧路后，只有在你选择欧路收藏时才会发送单词；网页句子同步默认开启，可在设置中关闭。欧路授权串保存在本机，并在欧路同步时发送给欧路服务用于验证。</li>
+                <li>Bing Dictionary、账号服务和欧路也可能按各自隐私政策处理请求时间、IP 地址等必要的网络连接信息。</li>
+                <li>朗读和 Chrome 本地翻译只在你主动使用时调用浏览器或设备能力；扩展不会因此把朗读文本或译文发送给 PrimoWords。</li>
+                <li>导出的 JSON、CSV 和 Anki TSV 文件只在你主动导出时下载到本机。</li>
+              </ul>
+            </section>
+          </div>
+
+          <p class="privacy-consent-policy"><a id="privacy-policy-link" href="#" target="_blank" rel="noreferrer" hidden>查看账号服务隐私政策</a></p>
+          <label class="privacy-consent-check" for="privacy-consent-checkbox">
+            <input id="privacy-consent-checkbox" type="checkbox">
+            <span>我已阅读并同意以上数据处理方式</span>
+          </label>
+          <p class="privacy-consent-status" id="privacy-consent-status" role="status" aria-live="polite"></p>
+          <div class="privacy-consent-actions">
+            <button class="button-secondary" id="privacy-consent-retry" type="button" hidden>重试读取</button>
+            <button id="privacy-consent-continue" type="button" disabled>同意并继续</button>
+          </div>
+        </div>
+      </section>
       <div class="workspace-loading" id="workspace-loading" role="status" hidden>
         <p id="workspace-loading-message">正在打开页面…</p>
         <button class="button-secondary" id="workspace-retry" type="button" hidden>重新加载</button>
@@ -34,7 +75,7 @@
       <iframe class="workspace-frame" data-workspace-frame="settings" title="设置" hidden></iframe>
     </main>
 
-    <footer class="app-footer"><span>PrimoWords · 查词收藏</span><span>本地词卡优先，收藏去向由你选择</span></footer>
+    <footer class="app-footer" hidden><span>PrimoWords · 查词收藏</span><span>本地词卡优先，收藏去向由你选择</span></footer>
   </div>
 </body>
 </html>

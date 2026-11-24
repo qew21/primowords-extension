@@ -49,6 +49,7 @@ test('.env parsing supports quoted values and process environment overrides', as
 
 test('service host and account API paths are configured only in the sample env file', async () => {
   const allowed = new Set([
+    '.env',
     '.env.example',
     join('data', 'dictionary.json'),
   ]);

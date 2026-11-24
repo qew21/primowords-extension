@@ -1,6 +1,7 @@
 /* global chrome */
+import './privacy-consent.js';
 import './ui-language.js';
-import { API_ENDPOINTS, post } from './api.js';
+import { API_ENDPOINTS, post, PRIVACY_POLICY_URL } from './api.js';
 import { readSession, removeSession } from './session.js';
 import { addHistory, hasFavorite, historyKey, LOCAL_HISTORY_KEY, pageUrl, removeHistory } from './favorites.js';
 import { eudicHistoryKey, readCollectionSettings } from './collection-settings.js';
@@ -15,6 +16,28 @@ let openingDictionary;
 let saveQueue = Promise.resolve();
 let localSaveQueue = Promise.resolve();
 let eudicSaveQueue = Promise.resolve();
+
+async function syncLookupMenu() {
+  let accepted = false;
+  try {
+    accepted = await globalThis.primowordsPrivacyConsent.hasConsent();
+  } catch {
+    accepted = false;
+  }
+  await new Promise(resolve => chrome.contextMenus.remove(lookupMenu, () => {
+    void chrome.runtime.lastError;
+    resolve();
+  }));
+  if (!accepted) return;
+  chrome.contextMenus.create({
+    id: lookupMenu,
+    title: i18n?.t('用PrimoWords 查词') ?? '用PrimoWords 查词',
+    contexts: ['selection'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*'],
+  }, () => {
+    if (chrome.runtime.lastError) console.error(chrome.runtime.lastError.message);
+  });
+}
 
 function wordKey(value) {
   if (typeof value !== 'string' || value.length > 120) return null;
@@ -241,6 +264,27 @@ async function deleteFavorite(message) {
 }
 
 async function handleMessage(message, sender) {
+  if (message?.type === 'content-ui-state') {
+    return i18n.getContentState();
+  }
+  if (message?.type === 'privacy-consent-status') {
+    return { accepted: await globalThis.primowordsPrivacyConsent.hasConsent() };
+  }
+  if (message?.type === 'privacy-policy-url') return { url: PRIVACY_POLICY_URL };
+  if (message?.type === 'privacy-consent-accept') {
+    const senderPage = sender.url?.split(/[?#]/, 1)[0];
+    if (senderPage !== chrome.runtime.getURL('workspace.html')) throw new Error('请在PrimoWords 隐私说明页面确认。');
+    await globalThis.primowordsPrivacyConsent.accept();
+    await syncLookupMenu();
+    return { accepted: true };
+  }
+  if (message?.type === 'privacy-consent-open') {
+    await chrome.runtime.openOptionsPage();
+    return {};
+  }
+  if (!await globalThis.primowordsPrivacyConsent.hasConsent()) {
+    throw new Error('请先阅读并同意PrimoWords 的数据处理说明。');
+  }
   switch (message?.type) {
     case 'warmup': await dictionary(); return {};
     case 'lookup': return lookup(message.word);
@@ -344,7 +388,10 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
   return true;
 });
 
-chrome.runtime.onStartup.addListener(preload);
+chrome.runtime.onStartup.addListener(() => {
+  preload();
+  void syncLookupMenu();
+});
 preload();
 
 function updateExtensionLabels() {
@@ -362,18 +409,22 @@ chrome.action.onClicked.addListener(() => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: lookupMenu,
-    title: i18n?.t('用PrimoWords 查词') ?? '用PrimoWords 查词',
-    contexts: ['selection'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*'],
-  }, () => {
-    if (chrome.runtime.lastError) console.error(chrome.runtime.lastError.message);
-  });
+  void syncLookupMenu();
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId !== lookupMenu || !info.selectionText) return;
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId !== lookupMenu) return;
+  let accepted;
+  try {
+    accepted = await globalThis.primowordsPrivacyConsent.hasConsent();
+  } catch {
+    accepted = false;
+  }
+  if (!accepted) {
+    await chrome.runtime.openOptionsPage();
+    return;
+  }
+  if (!info.selectionText) return;
   const url = new URL(chrome.runtime.getURL('quick-lookup.html'));
   url.hash = new URLSearchParams({
     word: info.selectionText.trim().slice(0, 121),

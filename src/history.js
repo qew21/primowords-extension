@@ -6,6 +6,7 @@ import {
   historyKey, importFavorites, LOCAL_HISTORY_KEY, observeHistory, pageUrl, parseImport, previewImport, queryHistory, updateHistorySentence,
 } from './favorites.js';
 
+if (await globalThis.primowordsPrivacyConsent.requireAccepted()) {
 const byId = id => document.getElementById(id);
 const i18n = globalThis.primowordsI18n;
 const setText = (element, source, values) => i18n?.setText ? i18n.setText(element, source, values) : (element.textContent = source);
@@ -570,3 +571,5 @@ i18n?.subscribe(({ locale }) => {
 
 await refreshHistory();
 if (location.hash === '#history-export' && !exportBar.hidden) byId('export-anki').focus();
+
+}

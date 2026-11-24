@@ -12,6 +12,70 @@ const setText = (element, source, values) => i18n?.setText ? i18n.setText(elemen
 let activeRoute;
 let requestedFrameHash;
 let loadingState = 'opening';
+let workspaceReady = false;
+let privacyPolicyReady = false;
+const privacyPanel = document.getElementById('privacy-consent');
+const privacyCheckbox = document.getElementById('privacy-consent-checkbox');
+const privacyContinue = document.getElementById('privacy-consent-continue');
+const privacyStatus = document.getElementById('privacy-consent-status');
+const privacyRetry = document.getElementById('privacy-consent-retry');
+const privacyPolicyLink = document.getElementById('privacy-policy-link');
+const primaryNav = document.querySelector('.primary-nav');
+const footer = document.querySelector('.app-footer');
+
+function updateConsentButton() {
+  privacyContinue.disabled = !privacyCheckbox.checked || !privacyPolicyReady;
+}
+
+function showConsent(message = '') {
+  workspaceReady = false;
+  primaryNav.hidden = true;
+  footer.hidden = true;
+  for (const frame of Object.values(frames)) frame.hidden = true;
+  loading.hidden = true;
+  privacyPanel.hidden = false;
+  privacyStatus.textContent = message;
+  privacyRetry.hidden = !message;
+  updateConsentButton();
+}
+
+function startWorkspace() {
+  workspaceReady = true;
+  privacyPanel.hidden = true;
+  primaryNav.hidden = false;
+  footer.hidden = false;
+  privacyStatus.textContent = '';
+  activate(readRoute());
+}
+
+async function sendPrivacyMessage(type) {
+  const response = await chrome.runtime.sendMessage({ type });
+  if (response?.error) throw new Error(response.error);
+  if (!response?.value) throw new Error('无法读取隐私确认状态，请重试。');
+  return response.value;
+}
+
+async function initializePrivacyGate() {
+  loading.hidden = false;
+  setText(loadingMessage, '正在读取隐私确认状态…');
+  try {
+    const [consent, policy] = await Promise.all([
+      sendPrivacyMessage('privacy-consent-status'),
+      sendPrivacyMessage('privacy-policy-url'),
+    ]);
+    if (typeof policy.url !== 'string' || new URL(policy.url).protocol !== 'https:') {
+      throw new Error('隐私政策地址无效，请重新加载扩展后重试。');
+    }
+    privacyPolicyLink.href = policy.url;
+    privacyPolicyLink.hidden = false;
+    privacyPolicyReady = true;
+    if (consent.accepted === true) startWorkspace();
+    else showConsent();
+  } catch (error) {
+    privacyPolicyReady = false;
+    showConsent(error.message || '无法读取隐私设置，请重试。');
+  }
+}
 
 function readRoute() {
   const value = decodeURIComponent(location.hash.slice(1).split('?')[0]);
@@ -87,6 +151,7 @@ function activate(state) {
 }
 
 function requestRoute(route, { view, hash } = {}) {
+  if (!workspaceReady) return;
   if (route === 'settings' && hash !== undefined) {
     requestedFrameHash = hash || '#account';
     lastSettingsHash.value = requestedFrameHash;
@@ -203,13 +268,27 @@ window.addEventListener('message', event => {
 });
 
 window.addEventListener('hashchange', () => {
-  const state = readRoute();
-  activate(state);
+  if (workspaceReady) activate(readRoute());
+});
+
+privacyCheckbox.addEventListener('change', updateConsentButton);
+privacyRetry.addEventListener('click', () => void initializePrivacyGate());
+privacyContinue.addEventListener('click', async () => {
+  if (!privacyCheckbox.checked || !privacyPolicyReady || privacyContinue.disabled) return;
+  privacyContinue.disabled = true;
+  privacyRetry.hidden = true;
+  privacyStatus.textContent = '';
+  try {
+    await sendPrivacyMessage('privacy-consent-accept');
+    startWorkspace();
+  } catch (error) {
+    showConsent(error.message || '无法保存同意状态，请重试。');
+  }
 });
 
 i18n?.subscribe(() => {
   if (loadingState === 'opening' && activeRoute) renderOpeningMessage(activeRoute);
 });
 
-const initial = readRoute();
-activate(initial);
+showConsent();
+void initializePrivacyGate();

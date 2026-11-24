@@ -1,4 +1,6 @@
 /* global chrome */
+void (async () => {
+  if (!await globalThis.primowordsPrivacyConsent.requireAccepted()) return;
 const { create, styles } = globalThis.primowordsLookupCard;
 const sheet = new CSSStyleSheet();
 sheet.replaceSync(styles);
@@ -38,3 +40,4 @@ if (selected) {
 } else {
   void view.refreshAccount();
 }
+})();

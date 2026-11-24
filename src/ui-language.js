@@ -18,6 +18,29 @@
     '主导航': 'Main navigation',
     '设置分页': 'Settings sections',
     'WORD WORKSPACE': 'WORD WORKSPACE',
+    'PRIVACY NOTICE': 'PRIVACY NOTICE',
+    '使用 PrimoWords 前，请确认数据处理方式': 'Review how data is handled before using PrimoWords',
+    '只有在你主动查词或使用收藏功能时，扩展才会处理以下信息。请阅读后勾选同意，才能继续使用。': 'The extension handles the information below only when you actively look up or save a word. Read this notice and check the box to continue.',
+    '网页查词与本机记录': 'Web lookup and local records',
+    '你主动双击查词或使用右键查词时，扩展读取所选英文单词，并优先查询随扩展提供的离线词典。': 'When you double-click a word or choose lookup from the context menu, the extension reads that English word and checks its bundled offline dictionary first.',
+    '网页双击或使用右键查词时，扩展读取当前网页地址和标题；双击还会读取包含所选词的句子，用于查词卡片及本机收藏来源记录。这些来源不会随查词发送给 PrimoWords。': 'When you double-click a word or use the context menu on a webpage, the extension reads the page URL and title. A double-click also reads the sentence containing the word. This information is used for the lookup card and local save history, and is not sent to PrimoWords with a lookup.',
+    '离线词典没有词卡时，扩展会把所选单词发送给 Bing Dictionary 查询释义和音标；不会发送网页地址、标题或句子。': 'If the offline dictionary has no word card, the selected word is sent to Bing Dictionary for definitions and phonetics. The page URL, title, and sentence are not sent.',
+    '本机收藏、历史、网页来源和句子保存在当前 Chrome 配置中，不会同步到开发者服务器。': 'Saved words, history, webpage sources, and sentences stay in this Chrome profile and are not synced to the developer’s server.',
+    '收藏去向与其他功能': 'Save destinations and other features',
+    '登录时，邮箱或手机号及密码通过 HTTPS 发送给配置的账号服务；密码不保存在扩展中。登录令牌保存在本机，并随账号操作发送给服务以完成验证；收藏到账号时会发送单词和收藏操作。': 'When you sign in, your email address or phone number and password are sent over HTTPS to the configured account service. The extension does not store your password. The sign-in token is stored locally and sent with account actions for authentication; saving to your account sends the word and save action.',
+    '连接欧路后，只有在你选择欧路收藏时才会发送单词；网页句子同步默认开启，可在设置中关闭。欧路授权串保存在本机，并在欧路同步时发送给欧路服务用于验证。': 'After connecting Eudic, the word is sent only when you choose Eudic as the save destination. Webpage sentences are included by default and can be turned off in Settings. Your Eudic authorization token is stored locally and sent to Eudic for authentication when syncing.',
+    'Bing Dictionary、账号服务和欧路也可能按各自隐私政策处理请求时间、IP 地址等必要的网络连接信息。': 'Bing Dictionary, the account service, and Eudic may also process necessary connection details, such as request time and IP address, under their respective privacy policies.',
+    '朗读和 Chrome 本地翻译只在你主动使用时调用浏览器或设备能力；扩展不会因此把朗读文本或译文发送给 PrimoWords。': 'Speech and Chrome on-device translation use browser or device features only when you request them. The extension does not send the spoken text or translation to PrimoWords for these features.',
+    '导出的 JSON、CSV 和 Anki TSV 文件只在你主动导出时下载到本机。': 'JSON, CSV, and Anki TSV files are downloaded to this device only when you choose to export them.',
+    '查看账号服务隐私政策': 'Read the account service privacy policy',
+    '我已阅读并同意以上数据处理方式': 'I have read and agree to the data practices above',
+    '同意并继续': 'Agree and continue',
+    '重试读取': 'Retry',
+    '正在读取隐私确认状态…': 'Checking privacy consent…',
+    '无法读取隐私确认状态，请重试。': 'Could not read privacy consent. Try again.',
+    '隐私政策地址无效，请重新加载扩展后重试。': 'The privacy policy URL is invalid. Reload the extension and try again.',
+    '无法读取隐私设置，请重试。': 'Could not read privacy settings. Try again.',
+    '无法保存同意状态，请重试。': 'Could not save your consent. Try again.',
     '查清楚，再决定要不要收藏。': 'Look it up, then decide whether to save it.',
     '优先查询项目词卡与离线词典；没有匹配词卡时自动切换到必应词典。': 'Search project word cards and the offline dictionary first. If there is no matching card, look up the word in Bing Dictionary.',
     '优先查询项目词卡与离线词典；没有词卡时自动切换到必应词典。': 'Search project word cards and the offline dictionary first. If there is no matching card, look up the word in Bing Dictionary.',
@@ -462,6 +485,9 @@
   async function setPreference(value) {
     const normalized = normalizePreference(value);
     if (!normalized) throw new Error('Unsupported interface language.');
+    if (!await globalThis.primowordsPrivacyConsent?.hasConsent()) {
+      throw new Error('请先阅读并同意PrimoWords 的数据处理说明。');
+    }
     await chrome.storage.local.set({ [STORAGE_KEY]: normalized });
     preference = normalized;
     locale = normalized === 'auto' ? resolveSystemLocale() : normalized;
@@ -475,7 +501,32 @@
     return () => listeners.delete(listener);
   }
 
-  globalThis.primowordsI18n = { t, localize, setText, setAttribute, subscribe, setPreference, getPreference: () => preference, getLocale: () => locale };
+  async function getContentState() {
+    const accepted = await globalThis.primowordsPrivacyConsent?.hasConsent();
+    if (!accepted) return { accepted: false, preference: 'auto' };
+    const result = await chrome.storage.local.get(STORAGE_KEY);
+    if (!Object.hasOwn(result, STORAGE_KEY)) return { accepted: true, preference: 'auto' };
+    const value = normalizePreference(result[STORAGE_KEY]);
+    if (!value) throw new Error('界面语言设置无效，请重新选择。');
+    return { accepted: true, preference: value };
+  }
+
+  function applyContentState(state) {
+    if (typeof state?.accepted !== 'boolean') throw new Error('无法读取隐私确认状态。');
+    const value = state.accepted ? normalizePreference(state.preference) : 'auto';
+    if (!value) throw new Error('界面语言设置无效，请重新选择。');
+    preference = value;
+    locale = value === 'auto' ? resolveSystemLocale() : value;
+    loadError = '';
+    publish();
+    return state.accepted;
+  }
+
+  globalThis.primowordsI18n = {
+    t, localize, setText, setAttribute, subscribe, setPreference,
+    getPreference: () => preference, getLocale: () => locale,
+    getContentState, applyContentState,
+  };
 
   if (globalThis.document && location.protocol === 'chrome-extension:') {
     const start = () => localize(document);
@@ -494,31 +545,48 @@
     });
   }
 
-  chrome?.storage?.local?.get(STORAGE_KEY).then(result => {
-    if (!Object.hasOwn(result, STORAGE_KEY)) return;
-    const value = normalizePreference(result[STORAGE_KEY]);
-    if (!value) {
-      loadError = '界面语言设置无效，请重新选择。';
-      return publish();
+  async function loadPreference() {
+    try {
+      if (location.protocol !== 'chrome-extension:') {
+        const response = await chrome.runtime.sendMessage({ type: 'content-ui-state' });
+        if (response?.error) throw new Error(response.error);
+        if (!response?.value) throw new Error('无法读取界面语言设置。');
+        applyContentState(response.value);
+        return;
+      }
+      if (!await globalThis.primowordsPrivacyConsent?.hasConsent()) {
+        preference = 'auto';
+        locale = resolveSystemLocale();
+        loadError = '';
+        publish();
+        return;
+      }
+      const result = await chrome.storage.local.get(STORAGE_KEY);
+      if (!Object.hasOwn(result, STORAGE_KEY)) {
+        preference = 'auto';
+        locale = resolveSystemLocale();
+        loadError = '';
+        return publish();
+      }
+      const value = normalizePreference(result[STORAGE_KEY]);
+      if (!value) {
+        loadError = '界面语言设置无效，请重新选择。';
+        return publish();
+      }
+      preference = value;
+      locale = value === 'auto' ? resolveSystemLocale() : value;
+      loadError = '';
+      publish();
+    } catch (error) {
+      loadError = error?.message || '无法读取界面语言设置。';
+      publish();
     }
-    preference = value;
-    locale = value === 'auto' ? resolveSystemLocale() : value;
-    publish();
-  }).catch(error => {
-    loadError = error?.message || '无法读取界面语言设置。';
-    publish();
-  });
+  }
 
   chrome?.storage?.onChanged?.addListener((changes, area) => {
-    if (area !== 'local' || !Object.hasOwn(changes, STORAGE_KEY)) return;
-    const value = normalizePreference(changes[STORAGE_KEY].newValue);
-    if (!value) {
-      loadError = '界面语言设置无效，请重新选择。';
-      return publish();
-    }
-    preference = value;
-    locale = value === 'auto' ? resolveSystemLocale() : value;
-    loadError = '';
-    publish();
+    if (area !== 'local' || (!changes[STORAGE_KEY] && !changes[globalThis.primowordsPrivacyConsent?.STORAGE_KEY])) return;
+    void loadPreference();
   });
+  void loadPreference();
+
 })();

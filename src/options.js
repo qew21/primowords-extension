@@ -4,6 +4,7 @@ import { readSession, writeSession, removeSession, SESSION_KEY } from './session
 import { readCollectionSettings, updateCollectionSettings } from './collection-settings.js';
 import { eudicBooks, EUDIC_PERMISSION } from './eudic.js';
 
+if (await globalThis.primowordsPrivacyConsent.requireAccepted()) {
 const byId = id => document.getElementById(id);
 byId('privacy-policy').href = PRIVACY_POLICY_URL;
 const i18n = globalThis.primowordsI18n;
@@ -316,3 +317,5 @@ try {
   collectionStatus(error.message, true, 'collection-status');
 }
 renderCollections();
+
+}

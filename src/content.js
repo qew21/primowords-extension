@@ -5,6 +5,24 @@
   const setAttribute = (node, name, source, values) => i18n?.setAttribute ? i18n.setAttribute(node, name, source, values) : node.setAttribute(name, source);
   const sentenceSegmenter = new Intl.Segmenter('en', { granularity: 'sentence' });
   let overlay;
+  let consentAccepted;
+
+  async function refreshPageState() {
+    try {
+      const response = await chrome.runtime.sendMessage({ type: 'content-ui-state' });
+      if (response?.error) throw new Error(response.error);
+      const state = response?.value;
+      if (typeof state?.accepted !== 'boolean') throw new Error('无法读取隐私确认状态。');
+      i18n?.applyContentState?.(state);
+      consentAccepted = state.accepted;
+      return consentAccepted;
+    } catch {
+      consentAccepted = false;
+      return false;
+    }
+  }
+
+  void refreshPageState();
 
   const sheet = new CSSStyleSheet();
   sheet.replaceSync(styles + `
@@ -120,8 +138,14 @@
     view.card.focus({ preventScroll: true });
   }
 
-  document.addEventListener('dblclick', event => {
-    if (!event.isTrusted || event.button !== 0 || event.composedPath().includes(overlay?.host)) return;
+  async function handleDoubleClick(event) {
+    if (!event.isTrusted) return;
+    const accepted = await refreshPageState();
+    if (!accepted) {
+      void chrome.runtime.sendMessage({ type: 'privacy-consent-open' }).catch(() => {});
+      return;
+    }
+    if (event.button !== 0 || event.composedPath().includes(overlay?.host)) return;
     const target = event.composedPath()[0];
     if (target instanceof HTMLElement && (target.isContentEditable || target.closest('input, textarea, select, [role="textbox"]'))) return;
     const isLink = target instanceof Element && Boolean(target.closest('a'));
@@ -135,7 +159,9 @@
     };
     showTrigger(selected, event.clientX, event.clientY, source);
     if (event.ctrlKey) openLookup(overlay, selected, source);
-  }, true);
+  }
+
+  document.addEventListener('dblclick', event => { void handleDoubleClick(event); }, true);
 
   document.addEventListener('pointerdown', event => {
     if (overlay && !event.composedPath().includes(overlay.host)) dismiss();
