@@ -61,7 +61,7 @@ async function transact(stores, mode, work) {
 function storedRecordIsValid(word, record) {
   return /^[a-z]+(?:[.'-][a-z]+)*$/.test(word) && word.length <= 120 &&
     record?.word === word && Number.isFinite(record.savedAt) && Number.isFinite(new Date(record.savedAt).getTime()) &&
-    ['definition', 'url', 'title', 'sentence', 'sentenceTranslation', 'sentenceSource']
+    ['definition', 'phonetic', 'url', 'title', 'sentence', 'sentenceTranslation', 'sentenceSource']
       .every(field => record[field] === undefined || typeof record[field] === 'string');
 }
 
@@ -261,7 +261,7 @@ export function parseImport(data) {
       throw new Error(`第 ${index + 1} 条收藏格式无效，请检查文件后重试。`);
     }
     if (!unique.has(word)) unique.set(word, {
-      word, savedAt, definition: record.definition || '', url: pageUrl(record.url),
+      word, savedAt, definition: record.definition || '', phonetic: record.phonetic || '', url: pageUrl(record.url),
       title: record.title || '', sentence: record.sentence || '',
       sentenceTranslation: record.sentenceTranslation || '', sentenceSource: record.sentenceSource || '',
     });

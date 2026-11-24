@@ -262,6 +262,8 @@ html.workspace-embedded .settings-nav { top: 20px; }
 .history-record:hover { border-color: var(--border-strong); box-shadow: 0 4px 14px rgb(24 52 40 / 5%); }
 .history-entry { display: flex; align-items: center; justify-content: space-between; gap: 10px 16px; }
 .history-headword { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.history-word-info { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 9px; min-width: 0; }
+.history-phonetic { color: var(--subtle); font-size: 12px; font-weight: 450; }
 .history-entry strong { overflow-wrap: anywhere; font-size: 18px; font-weight: 700; letter-spacing: -.015em; }
 .history-row-tools { display: flex; align-items: center; gap: 10px; flex: none; }
 .history-entry time { color: var(--subtle); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }

@@ -138,7 +138,8 @@ function favoriteSource(message, sender) {
   const sentence = url && typeof message.source?.sentence === 'string' ? message.source.sentence.trim().slice(0, 600) : '';
   const sentenceTranslation = sentence && typeof message.sentenceTranslation === 'string'
     ? message.sentenceTranslation.trim().slice(0, 2000) : '';
-  return { url, title, sentence, sentenceTranslation };
+  const phonetic = typeof message.phonetic === 'string' ? message.phonetic.trim().replace(/\s+/g, ' ').slice(0, 300) : '';
+  return { url, title, sentence, sentenceTranslation, phonetic };
 }
 
 async function saveLocal(term, source) {

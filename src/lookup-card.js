@@ -258,7 +258,7 @@
       try {
         const response = await send('save', {
           word: term.word, account: expectedAccount, destination: expectedDestination, source: origin, definition: onlineDefinition,
-          sentenceTranslation,
+          phonetic: phonetic.textContent, sentenceTranslation,
         });
         if (current !== revision) return;
         if (response.recheck) {

@@ -132,12 +132,22 @@ function renderHistory() {
     const word = document.createElement('strong');
     word.textContent = record.word;
     word.lang = 'en';
+    const wordInfo = document.createElement('div');
+    wordInfo.className = 'history-word-info';
+    wordInfo.append(word);
+    if (record.phonetic) {
+      const phonetic = document.createElement('span');
+      phonetic.className = 'history-phonetic';
+      phonetic.textContent = record.phonetic;
+      phonetic.lang = 'en';
+      wordInfo.append(phonetic);
+    }
     const speak = byId('history-speak').content.firstElementChild.cloneNode(true);
     setAttribute(speak, 'title', '朗读 {word}', { word: record.word });
     setAttribute(speak, 'aria-label', '朗读 {word}', { word: record.word });
     const headword = document.createElement('div');
     headword.className = 'history-headword';
-    headword.append(word, speak);
+    headword.append(wordInfo, speak);
     const time = document.createElement('time');
     time.dateTime = new Date(record.savedAt).toISOString();
     time.textContent = dateFormat.format(record.savedAt);
@@ -358,14 +368,14 @@ function ankiTsv(rows, layout) {
   const basic = layout === 'basic';
   const escape = value => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
     .replace(/\r\n|\r|\n/g, '<br>');
-  const fields = basic ? ['正面', '背面'] : ['单词', '释义', '原句', '中文译文', '网页链接', '例句来源'];
+  const fields = basic ? ['正面', '背面'] : ['单词', '音标', '释义', '原句', '中文译文', '网页链接', '例句来源'];
   const lines = rows.map(record => {
-    const { word, definition, sentence, sentenceTranslation, url, sentenceSource } = record;
+    const { word, phonetic, definition, sentence, sentenceTranslation, url, sentenceSource } = record;
     const attribution = sentenceSource === 'bing' ? '必应词典例句' : '';
     const values = basic
-      ? [escape(word), [definition, [sentence, sentenceTranslation, attribution].filter(Boolean).join('\n'), url]
+      ? [escape(word), [phonetic, definition, [sentence, sentenceTranslation, attribution].filter(Boolean).join('\n'), url]
         .filter(Boolean).map(escape).join('<br><br>')]
-      : [word, definition, sentence, sentenceTranslation, url, attribution || (sentence ? '网页原句' : '')];
+      : [word, phonetic, definition, sentence, sentenceTranslation, url, attribution || (sentence ? '网页原句' : '')];
     return values.map(quoteCell).join('\t');
   });
   return [`#separator:Tab`, `#html:${basic}`, `#columns:${fields.join('\t')}`, ...lines].join('\n') + '\n';
@@ -411,6 +421,7 @@ async function exportHistory(format) {
       category: view === 'account' ? 'primowords' : view,
       url: pageUrl(record.url),
       title: record.title ?? '',
+      phonetic: record.phonetic ?? '',
       sentence: record.sentence ?? '',
       sentenceTranslation: record.sentenceTranslation ?? '',
       sentenceSource: record.sentenceSource ?? '',
